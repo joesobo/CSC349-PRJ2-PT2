@@ -9,7 +9,7 @@ public class MatrixProduct{
     public static int[][] matrixProduct_DAC(int[][] A, int[][] B){
         int n = A.length;
 
-        if((n == A[0].length) && (B.length == B[0].length) && (n == B.length) && n % 2 == 0){
+        if((n == A[0].length) && (B.length == B[0].length) && (n == B.length) && isPowerOfTwo(n)){
             return matrixDAC(A, 0, 0, B, 0, 0, A.length);
         }else{
             throw new IllegalArgumentException("Error: matrix k values did not match");
@@ -20,17 +20,16 @@ public class MatrixProduct{
         int[][] C = new int[n][n];
         int[][] C11, C12, C21, C22;
 
-
         if(n==1){
             C[0][0] = A[startrowA][startcolA] * B[startrowB][startcolB];
         }else{
-            C11 = add_matrix(matrixDAC(A, startrowA, startcolA, B, startrowB, startcolB, n/2), startrowA, startcolA, matrixDAC(A, startrowA, startcolA + n/2, B, startrowB + n/2, startcolB, n/2), startrowB, startcolB, n);
-            C12 = add_matrix(matrixDAC(A, startrowA, startcolA, B, startrowB, startcolB + n/2, n/2), startrowA, startcolA, matrixDAC(A, startrowA, startcolA + n/2, B, startrowB + n/2, startcolB + n/2, n/2), startrowB, startcolB, n);
-            C21 = add_matrix(matrixDAC(A, startrowA + n/2, startcolA, B, startrowB, startcolB, n/2), startrowA, startcolA, matrixDAC(A, startrowA + n/2, startcolA + n/2, B, startrowB + n/2, startcolB, n/2), startrowB, startcolB, n);
-            C22 = add_matrix(matrixDAC(A, startrowA + n/2, startcolA, B, startrowB, startcolB + n/2, n/2), startrowA, startcolA, matrixDAC(A, startrowA + n/2, startcolA + n/2, B, startrowB + n/2, startcolB + n/2, n/2), startrowB, startcolB, n);
+            C11 = add_matrix(matrixDAC(A, startrowA, startcolA, B, startrowB, startcolB, n/2), 0, 0, matrixDAC(A, startrowA, startcolA + n/2, B, startrowB + n/2, startcolB, n/2), 0, 0, n/2);
+            C12 = add_matrix(matrixDAC(A, startrowA, startcolA, B, startrowB, startcolB + n/2, n/2), 0, 0, matrixDAC(A, startrowA, startcolA + n/2, B, startrowB + n/2, startcolB + n/2, n/2), 0, 0, n/2);
+            C21 = add_matrix(matrixDAC(A, startrowA + n/2, startcolA, B, startrowB, startcolB, n/2), 0, 0, matrixDAC(A, startrowA + n/2, startcolA + n/2, B, startrowB + n/2, startcolB, n/2), 0, 0, n/2);
+            C22 = add_matrix(matrixDAC(A, startrowA + n/2, startcolA, B, startrowB, startcolB + n/2, n/2), 0, 0, matrixDAC(A, startrowA + n/2, startcolA + n/2, B, startrowB + n/2, startcolB + n/2, n/2), 0, 0, n/2);
         
-            for(int i = 0; i < n/2-1; i++){
-                for(int j = 0; j < n/2-1; j++){
+            for(int i = 0; i < n/2; i++){
+                for(int j = 0; j < n/2; j++){
                     C[i][j] = C11[i][j];
                     C[i][j + n/2] = C12[i][j];
                     C[i + n/2][j] = C21[i][j];
@@ -45,8 +44,8 @@ public class MatrixProduct{
     public static int[][] matrixProduct_Strassen(int[][] A, int[][] B){
         int n = A.length;
 
-        if((n == A[0].length) && (B.length == B[0].length) && (n == B.length) && n % 2 == 0){
-            return matrixStrassen(A, 0, 0, B, 0, 0, A.length);
+        if((n == A[0].length) && (B.length == B[0].length) && (n == B.length) && isPowerOfTwo(n)){
+            return matrixStrassen(A, 0, 0, B, 0, 0, n);
         }else{
             throw new IllegalArgumentException("Error: matrix k values did not match");
         }
@@ -67,26 +66,26 @@ public class MatrixProduct{
             S4 = subtract_matrix(B, startrowB+n/2, startcolB, B, startrowB, startcolB, n/2);
             S5 = add_matrix(A, startrowA, startcolA, A, startrowA + n/2, startcolA + n/2, n/2);
             S6 = add_matrix(B, startrowB, startcolB, B, startrowB + n/2, startcolB + n/2, n/2);
-            S7 = subtract_matrix(A, startrowA, startcolA + n/2, A, startrowA + n/2, startcolB + n/2, n/2);
+            S7 = subtract_matrix(A, startrowA, startcolA + n/2, A, startrowA + n/2, startcolA + n/2, n/2);
             S8 = add_matrix(B, startrowB + n/2, startcolB, B, startrowB + n/2, startcolB + n/2, n/2);
             S9 = subtract_matrix(A, startrowA, startcolA, A, startrowA + n/2, startcolA, n/2);
             S10 = add_matrix(B, startrowB, startcolB, B, startrowB, startcolB + n/2, n/2);
 
-            P1 = matrixStrassen(A, startrowA, startcolA, S1, startrowB, startcolB, n/2);
-            P2 = matrixStrassen(S2, startrowA, startcolA, B, startrowB + n/2, startcolB + n/2, n/2);
-            P3 = matrixStrassen(S3, startrowA, startcolA, B, startrowB, startcolB, n/2);
-            P4 = matrixStrassen(A, startrowA+n/2, startcolA+n/2, S4, startrowB, startcolB, n/2);
-            P5 = matrixStrassen(S5, startrowA, startcolA, S6, startrowB, startcolB, n/2);
-            P6 = matrixStrassen(S7, startrowA, startcolA, S8, startrowB, startcolB, n/2);
-            P7 = matrixStrassen(S9, startrowA, startcolA, S10, startrowB, startcolB, n/2);
+            P1 = matrixStrassen(A, startrowA, startcolA, S1, 0, 0, n/2);
+            P2 = matrixStrassen(S2, 0, 0, B, startrowB + n/2, startcolB + n/2, n/2);
+            P3 = matrixStrassen(S3, 0, 0, B, startrowB, startcolB, n/2);
+            P4 = matrixStrassen(A, startrowA+n/2, startcolA+n/2, S4, 0, 0, n/2);
+            P5 = matrixStrassen(S5, 0, 0, S6, 0, 0, n/2);
+            P6 = matrixStrassen(S7, 0, 0, S8, 0, 0, n/2);
+            P7 = matrixStrassen(S9, 0, 0, S10, 0, 0, n/2);
 
-            C11 = add_matrix(subtract_matrix(add_matrix(P5, startrowA, startcolA, P4, startrowB, startcolB, n/2), startrowA, startcolA, P2, startrowB, startcolB, n/2), startrowA, startcolA, P6, startrowB, startcolB, n/2);
-            C12 = add_matrix(P1, startrowA, startcolA, P2, startrowB, startcolB, n/2);
-            C21 = add_matrix(P3, startrowA, startcolA, P4, startrowB, startcolB, n/2);
-            C22 = subtract_matrix(subtract_matrix(add_matrix(P5, startrowA, startcolA, P1, startrowB, startcolB, n/2), startrowA, startcolA, P3, startrowB, startcolB, n/2), startrowA, startcolA, P7, startrowB, startcolB, n/2);
+            C11 = add_matrix(subtract_matrix(add_matrix( P5, 0, 0, P4, 0, 0, n/2), 0, 0, P2, 0, 0, n/2), 0, 0, P6, 0, 0, n/2);
+            C12 = add_matrix(P1, 0, 0, P2, 0, 0, n/2);
+            C21 = add_matrix(P3, 0, 0, P4, 0, 0, n/2);
+            C22 = subtract_matrix(subtract_matrix(add_matrix(P5, 0, 0, P1, 0, 0, n/2), 0, 0, P3, 0, 0, n/2), 0, 0, P7, 0, 0, n/2);
 
-            for(int i = 0; i < n-1; i++){
-                for(int j = 0; j < n-1; j++){
+            for(int i = 0; i < n/2; i++){
+                for(int j = 0; j < n/2; j++){
                     C[i][j] = C11[i][j];
                     C[i][j + n/2] = C12[i][j];
                     C[i + n/2][j] = C21[i][j];
@@ -100,23 +99,30 @@ public class MatrixProduct{
     
     private static int[][] add_matrix(int[][] A, int startrowA, int startcolA, int[][] B, int startrowB, int startcolB, int n) {
         int[][] C = new int[n][n];
-        for (int i= 0; i<n-1; i++) {
-            for (int j = 0; j<n-1; j++){
+        for (int i = 0; i<n; i++) {
+            for (int j = 0; j<n; j++){
                 C[i][j] = A[startrowA + i][startcolA + j] + B[startrowB + i][startcolB + j];
             }
         }
         return C;
-        }
+    }
 
     private static int[][] subtract_matrix(int[][] A, int startrowA, int startcolA, int[][] B, int startrowB, int startcolB, int n) {
         int[][] C = new int[n][n];
-        for (int i= 0; i<n-1; i++) {
-            for (int j = 0; j<n-1; j++){
+        for (int i = 0; i<n; i++) {
+            for (int j = 0; j<n; j++){
                 C[i][j] = A[startrowA + i][startcolA + j] - B[startrowB + i][startcolB + j];
             }
         }
         return C;
     }
+
+    static boolean isPowerOfTwo(int n) { 
+        if(n==0){ 
+            return false; 
+        }
+        return (int)(Math.ceil((Math.log(n) / Math.log(2)))) == (int)(Math.floor(((Math.log(n) / Math.log(2))))); 
+    } 
 
     public static void main(String args[]){
         List<Integer> list = new ArrayList<Integer>();
@@ -183,7 +189,7 @@ public class MatrixProduct{
         int[][] C;
 
         try{
-            C = matrixProduct_Strassen(A, B);
+            C = matrixProduct_DAC(A, B);
         }
         //catch argument and close program
         catch(IllegalArgumentException ex){
