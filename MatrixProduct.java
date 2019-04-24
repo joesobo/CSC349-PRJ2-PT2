@@ -46,7 +46,7 @@ public class MatrixProduct{
         int n = A.length;
 
         if((n == A[0].length) && (B.length == B[0].length) && (n == B.length) && n % 2 == 0){
-            return matrixDAC(A, 0, 0, B, 0, 0, A.length);
+            return matrixStrassen(A, 0, 0, B, 0, 0, A.length);
         }else{
             throw new IllegalArgumentException("Error: matrix k values did not match");
         }
@@ -57,7 +57,6 @@ public class MatrixProduct{
         int[][] S1, S2, S3, S4, S5, S6, S7, S8, S9, S10;
         int[][] P1, P2, P3, P4, P5, P6, P7;
         int[][] C11, C12, C21, C22;
-
 
         if(n==1){
             C[0][0] = A[startrowA][startcolA] * B[startrowB][startcolB];
@@ -86,8 +85,8 @@ public class MatrixProduct{
             C21 = add_matrix(P3, startrowA, startcolA, P4, startrowB, startcolB, n/2);
             C22 = subtract_matrix(subtract_matrix(add_matrix(P5, startrowA, startcolA, P1, startrowB, startcolB, n/2), startrowA, startcolA, P3, startrowB, startcolB, n/2), startrowA, startcolA, P7, startrowB, startcolB, n/2);
 
-            for(int i = 0; i < n; i++){
-                for(int j = 0; j < n; j++){
+            for(int i = 0; i < n-1; i++){
+                for(int j = 0; j < n-1; j++){
                     C[i][j] = C11[i][j];
                     C[i][j + n/2] = C12[i][j];
                     C[i + n/2][j] = C21[i][j];
@@ -184,7 +183,7 @@ public class MatrixProduct{
         int[][] C;
 
         try{
-            C = matrixProduct_DAC(A, B);
+            C = matrixProduct_Strassen(A, B);
         }
         //catch argument and close program
         catch(IllegalArgumentException ex){
