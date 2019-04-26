@@ -1,3 +1,7 @@
+//Matrix Product Part 2
+//By Joseph Soboleski (jsoboles@calpoly.edu) and Salman Wajahat (swajahat@calpoly.edu)
+//4/26/19
+
 import java.io.FileReader;
 import java.io.*;
 import java.util.Scanner;
@@ -189,7 +193,7 @@ public class MatrixProduct{
         int[][] C;
 
         try{
-            C = matrixProduct_DAC(A, B);
+            C = matrixProduct_Strassen(A, B);
         }
         //catch argument and close program
         catch(IllegalArgumentException ex){
